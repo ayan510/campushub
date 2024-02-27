@@ -50,11 +50,11 @@ export default function App() {
   };
 
   return (
-    <div style={{ marginTop: '20px', marginLeft: '20px' }}>
+    <div style={{ padding: 20, maxWidth: 1000, margin: 'auto' }}>
       <MyContext.Provider value={{ user, setUser }}>
         {user ? (
           <div>
-            {user && (user.email === 'smdabdulla510@gmail.com' || user.email === 'mdsufyan7@gmail.com') ? (
+            {user ? (
               <div>
                 <Button
                   className={activePage === 'admin' ? 'active' : ''}
@@ -62,11 +62,15 @@ export default function App() {
                 >
                   Admin
                 </Button>
-                <Button
+                {/* <Button
                   className={activePage === 'user' ? 'active' : ''}
                   onClick={() => handlePageChange('user')}
                 >
                   User
+                </Button> */}
+                <Button className='logout' color='red' onClick={doLogout}>
+                  <Icon name='sign-out' />
+                  Logout
                 </Button>
                 {activePage === 'admin' && <Admin />}
                 {activePage === 'user' && <User />}
@@ -74,10 +78,6 @@ export default function App() {
             ) : (
               <User />
             )}
-            <Button className='logout' color='red' onClick={doLogout}>
-              <Icon name='sign-out' />
-              Logout
-            </Button>
           </div>
         ) : (
           <Grid centered style={{ marginTop: '50px' }}>

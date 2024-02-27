@@ -1,148 +1,169 @@
 import React, { useState, useEffect } from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import { ref, onValue, update, remove } from 'firebase/database';
+import { ref, onValue, update, remove, push, set } from 'firebase/database';
 import { db } from './firebase';
-import { Button, Header, Segment, Modal, Table, Input } from 'semantic-ui-react';
+import { Button, Header, Segment, Modal, Table, Input, Icon } from 'semantic-ui-react';
 
 const AdminPage = () => {
-  const [students, setStudents] = useState([]);
+  const [list, setList] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editStudentName, setEditStudentName] = useState('');
-  const [editPhone, setEditPhone] = useState('');
-  const [editClass, setEditClass] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
+  const [editId, setEditId] = useState(null)
+  const [student, setStudent] = useState('');
+  const [phone, setPhone] = useState('');
+  const [grade, setGrade] = useState('');
+  const [father, setFather] = useState('');
 
   useEffect(() => {
     const studentsRef = ref(db, 'students');
     onValue(studentsRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        const studentList = Object.entries(data).map(([key, value]) => ({
-          id: key,
-          ...value
-        }));
-        setStudents(studentList);
+        setList(data);
       } else {
-        setStudents([]);
+        setList([]);
       }
     });
   }, []);
 
-  const handleStudentClick = (student) => {
-    setSelectedStudent(student);
-    setEditStudentName(student.studentName);
-    setEditPhone(student.phone);
-    setEditClass(student.class);
-    setIsEditing(false);
+  const handleStudentClick = (id) => {
+    setStudent(list[id].student);
+    setPhone(list[id].phone);
+    setGrade(list[id].grade);
+    setFather(list[id].father);
+    setEditId(id)
     setModalOpen(true);
   };
 
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
   const handleSaveEdit = () => {
-    if (!editStudentName || !editPhone || !editClass) {
-      return;
-    }
-
-    update(ref(db, `students/${selectedStudent.id}`), {
-      studentName: editStudentName,
-      phone: editPhone,
-      class: editClass
-    });
-    setModalOpen(false);
+    update(ref(db, `students/${editId}`), { student, phone, grade, father });
+    closeModal()
   };
 
   const handleApprove = () => {
-    if (selectedStudent) {
-      update(ref(db, `students/${selectedStudent.id}`), { status: 'Approved' });
-      setModalOpen(false);
+    if (editId) {
+      set(ref(db, `students/${editId}/status/`), true);
+      closeModal()
     }
   };
 
   const handleReject = () => {
-    if (selectedStudent) {
-      update(ref(db, `students/${selectedStudent.id}`), { status: 'Rejected' });
-      setModalOpen(false);
+    if (editId) {
+      set(ref(db, `students/${editId}/status/`), false);
+      closeModal()
     }
   };
 
   const handleDelete = () => {
-    if (selectedStudent) {
-      remove(ref(db, `students/${selectedStudent.id}`));
-      setModalOpen(false);
+    if (editId) {
+      remove(ref(db, `students/${editId}`));
+      closeModal()
     }
   };
 
+  function closeModal() {
+    setStudent('')
+    setPhone('')
+    setGrade('')
+    setFather('')
+    setEditId(null)
+    setModalOpen(false)
+  }
+
+  function addItem() {
+    push(ref(db, 'students'), { student, grade, phone, father })
+    closeModal()
+  }
+
   return (
-    <div style={{ margin: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div style={{ margin: '20px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
       <Header as='h2' style={{ textAlign: 'center', color: 'teal' }}>Student Applications</Header>
+      <Button color='green' onClick={() => setModalOpen(true)}>Add New Student</Button>
       <Segment>
-        <Table celled selectable>
+        <Table celled selectable unstackable>
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell>Student Name</Table.HeaderCell>
               <Table.HeaderCell>Phone</Table.HeaderCell>
               <Table.HeaderCell>Class</Table.HeaderCell>
+              <Table.HeaderCell>Father Name</Table.HeaderCell>
+              <Table.HeaderCell>Status</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {students.map(student => (
-              <Table.Row key={student.id} onClick={() => handleStudentClick(student)}>
-                <Table.Cell>{student.studentName}</Table.Cell>
-                <Table.Cell>{student.phone}</Table.Cell>
-                <Table.Cell>{student.class}</Table.Cell>
+            {Object.entries(list).map(item => (
+              <Table.Row
+                positive={item[1].status === true}
+                negative={item[1].status === false}
+                key={item[0]}
+                onClick={() => handleStudentClick(item[0])}
+              >
+                <Table.Cell>{item[1].student}</Table.Cell>
+                <Table.Cell>{item[1].phone}</Table.Cell>
+                <Table.Cell>{item[1].grade}</Table.Cell>
+                <Table.Cell>{item[1].father}</Table.Cell>
+                <Table.Cell>
+                  {item[1].status === true && <Icon name='check' />}
+                  {item[1].status === false && <Icon name='close' />}
+                </Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>
         </Table>
       </Segment>
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} size='tiny' centered>
+      <Modal open={modalOpen} closeOnDimmerClick={false} onClose={closeModal} size='small' centered>
         <Modal.Header>Student Details</Modal.Header>
         <Modal.Content>
           <Input
             fluid
             label='Student Name'
-            value={editStudentName}
+            value={student}
             onChange={(e) => {
-              setEditStudentName(e.target.value);
-              setIsEditing(true);
+              setStudent(e.target.value);
             }}
           />
           <br />
           <Input
             fluid
             label='Phone'
-            value={editPhone}
+            value={phone}
             onChange={(e) => {
-              setEditPhone(e.target.value);
-              setIsEditing(true);
+              setPhone(e.target.value);
             }}
           />
           <br />
           <Input
             fluid
             label='Class'
-            value={editClass}
+            value={grade}
             onChange={(e) => {
-              setEditClass(e.target.value);
-              setIsEditing(true);
+              setGrade(e.target.value);
+            }}
+          />
+          <br />
+          <Input
+            fluid
+            label='Father'
+            value={father}
+            onChange={(e) => {
+              setFather(e.target.value);
             }}
           />
         </Modal.Content>
         <Modal.Actions>
-          {!isEditing && (
-            <Button color='blue' onClick={handleEdit}>Edit</Button>
-          )}
-          {isEditing && (
-            <Button color='blue' onClick={handleSaveEdit}>Save</Button>
-          )}
-          <Button color='teal' onClick={handleApprove}>Approve</Button>
-          <Button color='red' onClick={handleReject}>Reject</Button>
-          <Button color='black' onClick={handleDelete}>Delete</Button>
-          <Button onClick={() => setModalOpen(false)}>Cancel</Button>
+          {!editId ?
+            <Button color='green' onClick={addItem}>Add</Button>
+            :
+            <>
+              {editId && (
+                <Button color='blue' onClick={handleSaveEdit}>Save</Button>
+              )}
+              <Button color='green' onClick={handleApprove}>Approve</Button>
+              <Button color='yellow' onClick={handleReject}>Reject</Button>
+              <Button color='red' onClick={handleDelete}>Delete</Button>
+            </>
+          }
+          <Button color='black' onClick={closeModal}>Cancel</Button>
         </Modal.Actions>
       </Modal>
     </div>
