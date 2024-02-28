@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import { ref, push, onValue, update } from 'firebase/database';
 import { db } from './firebase';
-import { Button, Form, Input, Header, Segment, Modal, Icon, Message, List } from 'semantic-ui-react';
+import { Button, Form, Input, Header, Segment, Modal, Table } from 'semantic-ui-react';
 import { MyContext } from '../App';
 
 const UserPage = () => {
@@ -15,7 +15,7 @@ const UserPage = () => {
   const [students, setStudents] = useState([]);
 
   useEffect(() => {
-    const studentsRef = ref(db, 'students');
+    const studentsRef = ref(db, 'students/' + user.uid);
     onValue(studentsRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -28,7 +28,7 @@ const UserPage = () => {
         setStudents([]);
       }
     });
-  }, []);
+  }, [user.uid]);
 
   const handleStudentNameChange = (e) => setStudentName(e.target.value);
   const handlePhoneChange = (e) => setPhone(e.target.value);
@@ -42,7 +42,7 @@ const UserPage = () => {
 
     setLoading(true);
 
-    const newUserPageRef = push(ref(db, 'students'), {
+    const newUserPageRef = push(ref(db, 'students/' + user.uid), {
       studentName,
       phone,
       class: classValue,
@@ -57,11 +57,11 @@ const UserPage = () => {
   };
 
   const handleApprove = (studentId) => {
-    update(ref(db, `students/${studentId}`), { status: 'Approved' });
+    update(ref(db, `students/${user.uid}/${studentId}`), { status: 'Approved' });
   };
 
   const handleReject = (studentId) => {
-    update(ref(db, `students/${studentId}`), { status: 'Rejected' });
+    update(ref(db, `students/${user.uid}/${studentId}`), { status: 'Rejected' });
   };
 
   return (
@@ -96,30 +96,45 @@ const UserPage = () => {
           <Button loading={loading} color='teal' type='submit' primary>Add Student</Button>
         </Form>
       </Segment>
-      <Segment>
-        <Header as='h2' style={{ textAlign: 'center', color: 'teal' }}>Status</Header>
-        <List divided relaxed>
-          {students.map(student => (
-            <List.Item key={student.id}>
-              <List.Content>
-                <List.Header>{student.studentName}</List.Header>
-                <List.Description>
-                  <p><strong>Phone:</strong> {student.phone}</p>
-                  <p><strong>Class:</strong> {student.class}</p>
-                  <p><strong>Status:</strong> {student.status}</p>
+      {students.length > 0 && (
+        <Segment>
+          <Header as='h2' style={{ textAlign: 'center', color: 'teal' }}>Status</Header>
+          <Table celled unstackable>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Student Name</Table.HeaderCell>
+                <Table.HeaderCell>Phone</Table.HeaderCell>
+                <Table.HeaderCell>Class</Table.HeaderCell>
+                <Table.HeaderCell>Status</Table.HeaderCell>
+                {user.isAdmin && <Table.HeaderCell>Actions</Table.HeaderCell>}
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {students.map(student => (
+                <Table.Row key={student.id}>
+                  <Table.Cell>{student.studentName}</Table.Cell>
+                  <Table.Cell>{student.phone}</Table.Cell>
+                  <Table.Cell>{student.class}</Table.Cell>
+                  <Table.Cell>{student.status}</Table.Cell>
                   {user.isAdmin && (
-                    <Button.Group>
-                      <Button color='green' onClick={() => handleApprove(student.id)}>Approve</Button>
-                      <Button.Or />
-                      <Button color='red' onClick={() => handleReject(student.id)}>Reject</Button>
-                    </Button.Group>
+                    <Table.Cell>
+                      <Button.Group>
+                        <Button color='green' onClick={() => handleApprove(student.id)}>Approve</Button>
+                        <Button.Or />
+                        <Button color='red' onClick={() => handleReject(student.id)}>Reject</Button>
+                      </Button.Group>
+                    </Table.Cell>
                   )}
-                </List.Description>
-              </List.Content>
-            </List.Item>
-          ))}
-        </List>
-      </Segment>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table>
+          {students.some(student => student.status === 'Pending') && (
+            <p style={{ textAlign: 'center', marginTop: '10px', color: 'gray' }}> Please wait for our confirmation.</p>
+          )}
+        </Segment>
+      )}
+
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -139,3 +154,5 @@ const UserPage = () => {
 };
 
 export default UserPage;
+
+// BEST 1 WITH FUNCTIONALITY

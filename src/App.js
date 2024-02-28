@@ -3,7 +3,7 @@ import { auth } from './comp/firebase';
 import './App.css';
 import 'semantic-ui-css/semantic.min.css';
 import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
-import { Button, Grid, Icon } from 'semantic-ui-react';
+import { Button, Grid, Icon, Card } from 'semantic-ui-react';
 import Admin from './comp/AdminPage';
 import User from './comp/UserPage';
 
@@ -50,10 +50,14 @@ export default function App() {
   };
 
   return (
-    <div style={{ marginTop: '20px', marginLeft: '20px' }}>
+    <div style={{ marginTop: '20px', marginLeft: '20px', position: 'relative' }}>
       <MyContext.Provider value={{ user, setUser }}>
         {user ? (
           <div>
+            <Button className='logout' color='red' onClick={doLogout} style={{ position: 'absolute', top: '10px', right: '10px' }}>
+              <Icon name='sign-out' />
+              Logout
+            </Button>
             {user && (user.email === 'smdabdulla510@gmail.com' || user.email === 'mdsufyan7@gmail.com') ? (
               <div>
                 <Button
@@ -66,7 +70,7 @@ export default function App() {
                   className={activePage === 'user' ? 'active' : ''}
                   onClick={() => handlePageChange('user')}
                 >
-                  User
+                  Student
                 </Button>
                 {activePage === 'admin' && <Admin />}
                 {activePage === 'user' && <User />}
@@ -74,13 +78,20 @@ export default function App() {
             ) : (
               <User />
             )}
-            <Button className='logout' color='red' onClick={doLogout}>
-              <Icon name='sign-out' />
-              Logout
-            </Button>
           </div>
         ) : (
           <Grid centered style={{ marginTop: '50px' }}>
+            <Grid.Row>
+              <Card style={{ width: '400px', padding: '20px', boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.2)' }}>
+                <Card.Content>
+                  <Card.Header>Welcome to CampusHub</Card.Header>
+                  <Card.Description>
+                    <p>We welcome you to CampusHub, your platform for submitting applications.</p>
+                    <p>Please log in to submit your applications.</p>
+                  </Card.Description>
+                </Card.Content>
+              </Card>
+            </Grid.Row>
             <Grid.Row>
               <Button color='green' onClick={doLogin} style={{ marginTop: '20px', boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.2)' }}>
                 <Icon name='google' />
