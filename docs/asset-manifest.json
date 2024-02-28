@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/campushub/static/css/main.31dfc589.css",
-    "main.js": "/campushub/static/js/main.d82007a5.js",
+    "main.js": "/campushub/static/js/main.c2b2c5f5.js",
     "static/js/453.41443bb5.chunk.js": "/campushub/static/js/453.41443bb5.chunk.js",
     "static/media/brand-icons.svg": "/campushub/static/media/brand-icons.6729d29753e000c17489.svg",
     "static/media/icons.svg": "/campushub/static/media/icons.62d9dae4e0040e81c980.svg",
@@ -21,11 +21,11 @@
     "static/media/outline-icons.woff2": "/campushub/static/media/outline-icons.687a4990ea22bb1a49d4.woff2",
     "index.html": "/campushub/index.html",
     "main.31dfc589.css.map": "/campushub/static/css/main.31dfc589.css.map",
-    "main.d82007a5.js.map": "/campushub/static/js/main.d82007a5.js.map",
+    "main.c2b2c5f5.js.map": "/campushub/static/js/main.c2b2c5f5.js.map",
     "453.41443bb5.chunk.js.map": "/campushub/static/js/453.41443bb5.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.31dfc589.css",
-    "static/js/main.d82007a5.js"
+    "static/js/main.c2b2c5f5.js"
   ]
 }

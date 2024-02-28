@@ -13,6 +13,7 @@ const UserPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [students, setStudents] = useState([]);
+  const isAdmin = user && (user.email === 'smdabdulla510@gmail.com' || user.email === 'mdsufyan7@gmail.com');
 
   useEffect(() => {
     const studentsRef = ref(db, 'students/' + user.uid);
@@ -66,38 +67,41 @@ const UserPage = () => {
 
   return (
     <div style={{ margin: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <Segment padded='very' raised>
-        <Header as='h2' style={{ textAlign: 'center', color: 'teal' }}>Add Student</Header>
-        <Form onSubmit={handleSubmit}>
-          <Form.Field
-            control={Input}
-            label='Student Name'
-            placeholder='Student Name'
-            value={studentName}
-            onChange={handleStudentNameChange}
-            style={{ maxWidth: '300px' }}
-          />
-          <Form.Field
-            control={Input}
-            label='Phone'
-            placeholder='Phone'
-            value={phone}
-            onChange={handlePhoneChange}
-            style={{ maxWidth: '300px' }}
-          />
-          <Form.Field
-            control={Input}
-            label='Class'
-            placeholder='Class'
-            value={classValue}
-            onChange={handleClassChange}
-            style={{ maxWidth: '300px' }}
-          />
-          <Button loading={loading} color='teal' type='submit' primary>Add Student</Button>
-        </Form>
-      </Segment>
+      {(isAdmin || students.length === 0) && (
+        <Segment padded='very' raised style={{ marginTop: '60px' }}>
+          <Header as='h2' style={{ textAlign: 'center', color: 'teal' }}>Application for Student Registration</Header>
+          <Form onSubmit={handleSubmit}>
+            <Form.Field
+              control={Input}
+              label='Student Name'
+              placeholder='Student Name'
+              value={studentName}
+              onChange={handleStudentNameChange}
+              style={{ maxWidth: '300px' }}
+            />
+            <Form.Field
+              control={Input}
+              label='Phone'
+              placeholder='Phone'
+              value={phone}
+              onChange={handlePhoneChange}
+              style={{ maxWidth: '300px' }}
+            />
+            <Form.Field
+              control={Input}
+              label='Class'
+              placeholder='Class'
+              value={classValue}
+              onChange={handleClassChange}
+              style={{ maxWidth: '300px' }}
+            />
+            <Button loading={loading} color='teal' type='submit' primary>{isAdmin ? 'Add Student' : 'Save'}</Button>
+          </Form>
+        </Segment>
+      )}
+
       {students.length > 0 && (
-        <Segment>
+        <Segment style={{ marginTop: '60px' }}>
           <Header as='h2' style={{ textAlign: 'center', color: 'teal' }}>Status</Header>
           <Table celled unstackable>
             <Table.Header>
@@ -106,7 +110,7 @@ const UserPage = () => {
                 <Table.HeaderCell>Phone</Table.HeaderCell>
                 <Table.HeaderCell>Class</Table.HeaderCell>
                 <Table.HeaderCell>Status</Table.HeaderCell>
-                {user.isAdmin && <Table.HeaderCell>Actions</Table.HeaderCell>}
+                {isAdmin && <Table.HeaderCell>Actions</Table.HeaderCell>}
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -116,7 +120,7 @@ const UserPage = () => {
                   <Table.Cell>{student.phone}</Table.Cell>
                   <Table.Cell>{student.class}</Table.Cell>
                   <Table.Cell>{student.status}</Table.Cell>
-                  {user.isAdmin && (
+                  {isAdmin && (
                     <Table.Cell>
                       <Button.Group>
                         <Button color='green' onClick={() => handleApprove(student.id)}>Approve</Button>
@@ -130,7 +134,7 @@ const UserPage = () => {
             </Table.Body>
           </Table>
           {students.some(student => student.status === 'Pending') && (
-            <p style={{ textAlign: 'center', marginTop: '10px', color: 'gray' }}> Please wait for our confirmation.</p>
+            <p style={{ textAlign: 'center', marginTop: '10px', color: 'gray' }}>{isAdmin ? 'Please Update the Status of Applications' : 'Please wait for CampusHub'}</p>
           )}
         </Segment>
       )}
@@ -154,5 +158,3 @@ const UserPage = () => {
 };
 
 export default UserPage;
-
-// BEST 1 WITH FUNCTIONALITY
