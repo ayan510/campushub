@@ -81,8 +81,9 @@ const AdminPage = () => {
 
   return (
     <div style={{ margin: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <Header as='h2' style={{ textAlign: 'center', color: 'teal' }}>Student Applications</Header>
-      <Segment>
+      <Segment raised style={{ marginTop: '-1px', marginTop: '20px' }}>
+        <Header as='h2' style={{ textAlign: 'center', color: 'teal' }}>Student Applications</Header>
+
         <Table celled unstackable>
           <Table.Header>
             <Table.Row>
@@ -103,54 +104,55 @@ const AdminPage = () => {
             ))}
           </Table.Body>
         </Table>
+
+        <Modal open={modalOpen} onClose={() => setModalOpen(false)} size='tiny' centered>
+          <Modal.Header>
+            Student Details
+            <Icon name='close' onClick={() => setModalOpen(false)} style={{ cursor: 'pointer', float: 'right' }} />
+          </Modal.Header>
+          <Modal.Content>
+            {editStudent && (
+              <div>
+                <Input
+                  fluid
+                  label='Student Name'
+                  value={editStudent.studentName}
+                  onChange={(e) => setEditStudent({ ...editStudent, studentName: e.target.value })}
+                  disabled={!isEditing}
+                />
+                <br />
+                <Input
+                  fluid
+                  label='Phone'
+                  value={editStudent.phone}
+                  onChange={(e) => setEditStudent({ ...editStudent, phone: e.target.value })}
+                  disabled={!isEditing}
+                />
+                <br />
+                <Input
+                  fluid
+                  label='Class'
+                  value={editStudent.class}
+                  onChange={(e) => setEditStudent({ ...editStudent, class: e.target.value })}
+                  disabled={!isEditing}
+                />
+              </div>
+            )}
+          </Modal.Content>
+          <Modal.Actions>
+            {!isEditing && (
+              <Button color='blue' onClick={handleToggleEdit}>Edit</Button>
+            )}
+            {isEditing && (
+              <Button color='blue' onClick={handleSaveEdit}>Save</Button>
+            )}
+            <Button color='green' onClick={handleApprove}>Approve</Button>
+            <Button color='yellow' onClick={handlePending}>Pending</Button>
+            <Button color='red' onClick={handleReject}>Reject</Button>
+            <Button color='black' onClick={handleDelete}>Delete</Button>
+          </Modal.Actions>
+        </Modal>
       </Segment>
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} size='tiny' centered>
-        <Modal.Header>
-          Student Details
-          <Icon name='close' onClick={() => setModalOpen(false)} style={{ cursor: 'pointer', float: 'right' }} />
-        </Modal.Header>
-        <Modal.Content>
-          {editStudent && (
-            <div>
-              <Input
-                fluid
-                label='Student Name'
-                value={editStudent.studentName}
-                onChange={(e) => setEditStudent({ ...editStudent, studentName: e.target.value })}
-                disabled={!isEditing}
-              />
-              <br />
-              <Input
-                fluid
-                label='Phone'
-                value={editStudent.phone}
-                onChange={(e) => setEditStudent({ ...editStudent, phone: e.target.value })}
-                disabled={!isEditing}
-              />
-              <br />
-              <Input
-                fluid
-                label='Class'
-                value={editStudent.class}
-                onChange={(e) => setEditStudent({ ...editStudent, class: e.target.value })}
-                disabled={!isEditing}
-              />
-            </div>
-          )}
-        </Modal.Content>
-        <Modal.Actions>
-          {!isEditing && (
-            <Button color='blue' onClick={handleToggleEdit}>Edit</Button>
-          )}
-          {isEditing && (
-            <Button color='blue' onClick={handleSaveEdit}>Save</Button>
-          )}
-          <Button color='green' onClick={handleApprove}>Approve</Button>
-          <Button color='yellow' onClick={handlePending}>Pending</Button>
-          <Button color='red' onClick={handleReject}>Reject</Button>
-          <Button color='black' onClick={handleDelete}>Delete</Button>
-        </Modal.Actions>
-      </Modal>
     </div>
   );
 };

@@ -101,7 +101,7 @@ const UserPage = () => {
       )}
 
       {students.length > 0 && (
-        <Segment style={{ marginTop: '60px' }}>
+        <Segment raised style={{ marginTop: '60px' }}>
           <Header as='h2' style={{ textAlign: 'center', color: 'teal' }}>Status</Header>
           <Table celled unstackable>
             <Table.Header>

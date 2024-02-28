@@ -54,19 +54,19 @@ export default function App() {
       <MyContext.Provider value={{ user, setUser }}>
         {user ? (
           <div>
-            <Button className='logout' color='red' onClick={doLogout} style={{ position: 'absolute', top: '10px', right: '10px' }}>
+            <Button className='logout' color='red' onClick={doLogout} style={{ position: 'absolute', right: '10px' }}>
               <Icon name='sign-out' />
               Logout
             </Button>
             {user && (user.email === 'smdabdulla510@gmail.com' || user.email === 'mdsufyan7@gmail.com') ? (
               <div>
-                <Button
+                <Button color='green'
                   className={activePage === 'admin' ? 'active' : ''}
                   onClick={() => handlePageChange('admin')}
                 >
                   Admin
                 </Button>
-                <Button
+                <Button color='yellow'
                   className={activePage === 'user' ? 'active' : ''}
                   onClick={() => handlePageChange('user')}
                 >
